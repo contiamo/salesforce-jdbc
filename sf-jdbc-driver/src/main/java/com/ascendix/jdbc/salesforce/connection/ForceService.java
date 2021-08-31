@@ -22,8 +22,8 @@ public class ForceService {
 
     public static final String DEFAULT_LOGIN_DOMAIN = "login.salesforce.com";
     private static final String SANDBOX_LOGIN_DOMAIN = "test.salesforce.com";
-    private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
-    private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+    private static final long OAUTH_CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
+    private static final long OAUTH_READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
     public static final String DEFAULT_API_VERSION = "50.0";
     public static final int EXPIRE_AFTER_CREATE = 60;
     public static final int EXPIRE_STORE_SIZE = 16;
@@ -43,7 +43,7 @@ public class ForceService {
     }
 
     private static String getPartnerUrlFromUserInfo(String accessToken, boolean sandbox) {
-        return new ForceOAuthClient(CONNECTION_TIMEOUT, READ_TIMEOUT).getUserInfo(accessToken, sandbox).getPartnerUrl();
+        return new ForceOAuthClient(OAUTH_CONNECTION_TIMEOUT, OAUTH_READ_TIMEOUT).getUserInfo(accessToken, sandbox).getPartnerUrl();
     }
 
     public static PartnerConnection createPartnerConnection(ForceConnectionInfo info) throws ConnectionException {
@@ -52,6 +52,8 @@ public class ForceService {
 
     private static PartnerConnection createConnectionBySessionId(ForceConnectionInfo info) throws ConnectionException {
         ConnectorConfig partnerConfig = new ConnectorConfig();
+        partnerConfig.setReadTimeout(info.getReadTimeout());
+        partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
         partnerConfig.setSessionId(info.getSessionId());
 
         if (info.getSandbox() != null) {
@@ -76,6 +78,8 @@ public class ForceService {
             throws ConnectionException {
 
         ConnectorConfig partnerConfig = new ConnectorConfig();
+        partnerConfig.setReadTimeout(info.getReadTimeout());
+        partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
         partnerConfig.setUsername(info.getUserName());
         partnerConfig.setPassword(info.getPassword());
 
